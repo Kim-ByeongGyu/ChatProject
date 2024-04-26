@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 
-class ChatThread extends Thread {
+class ChatThread implements Runnable {
     //생성자를 통해서 클라이언트 소켓을 얻어옴.
     private Socket socket;
     private String nickname;

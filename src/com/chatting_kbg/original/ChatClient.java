@@ -21,9 +21,6 @@ public class ChatClient {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             Scanner stdIn = new Scanner(System.in);
 
-//            InetAddress ip = InetAddress.getLocalHost();
-//            out.println(ip.getHostAddress());
-
             System.out.print("Enter your nickname: ");
             String nickname = stdIn.nextLine();
             out.println(nickname); // 서버에 닉네임을 전송
@@ -38,7 +35,6 @@ public class ChatClient {
                 userInput = stdIn.nextLine();
 
                 // '/bye'를 입력하면 클라이언트를 종료합니다.
-//                if ("/bye".equals(userInput)) {
                 if (userInput.startsWith("/bye")) {
                     out.println(userInput);
                     break;

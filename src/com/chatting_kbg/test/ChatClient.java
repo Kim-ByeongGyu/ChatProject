@@ -1,6 +1,6 @@
 package com.chatting_kbg.test;
 
-import com.chatting_kbg.ServerMessageReader;
+import com.chatting_kbg.original.ServerMessageReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,9 +10,12 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ChatClient {
+    private static boolean inRoom = false;
+    private static String currentRoom = "";
+
     public static void main(String[] args) {
-        String hostName = "localhost"; // 서버가 실행 중인 호스트의 이름 또는 IP 주소
-        int portNumber = 12345; // 서버와 동일한 포트 번호 사용
+        String hostName = "localhost";
+        int portNumber = 12345;
 
         Socket socket = null;
         PrintWriter out = null;
@@ -35,16 +38,32 @@ public class ChatClient {
             String userInput;
             while (true) {
                 userInput = stdIn.nextLine();
+                String[] commands = userInput.split(" ", 2);
+                String command = commands[0];
+                if (!inRoom) {
+                    if ("/create".equals(command)) {
+                        out.println(userInput); // 서버에 방 생성 요청 전송
+                    } else if ("/join".equals(command)) {
+                        out.println(userInput); // 서버에 방 참여 요청 전송
+                        currentRoom = commands[1];
+                        inRoom = true;
+                    } else if ("/list".equals(userInput)) {
+                        out.println(userInput);
+                    } else {
+                        System.out.println("방에 참여해주세요.");
+                    }
+                } else {
+                    if (userInput.startsWith("/bye")) {
+                        out.println(userInput);
+                        break;
+                    }
+                    if (userInput.startsWith("/w ")) {
+                        out.println(userInput);
+                    }
+                        out.println(currentRoom + " " + userInput); // 자신의 메시지를 서버로 보내지 않음
 
-                // '/bye'를 입력하면 클라이언트를 종료합니다.
-//                if ("/bye".equals(userInput)) {
-                if (userInput.startsWith("/bye")) {
-                    out.println(userInput);
-                    break;
                 }
 
-                // 서버에 메시지를 전송합니다.
-                out.println(userInput);
             } // while
 
             // 클라이언트와 서버는 명시적으로 close를 합니다. close를 할 경우 상대방쪽의 readLine()이 null을 반환됩니다. 이 값을 이용하여 접속이 종료된 것을 알 수 있습니다.

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChatSever {
-    public static void main(String[] args) {
+    private static void serverOn () {
         try (ServerSocket serverSocket = new ServerSocket(12345);
         ) {
             System.out.println("서버가 준비되었습니다.");
@@ -17,11 +17,14 @@ public class ChatSever {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                new ChatThread(socket, chatClients).start();
+                new Thread(new ChatThread(socket, chatClients)).start();
             } // while
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    public static void main(String[] args) {
+        serverOn();
     }
 }
