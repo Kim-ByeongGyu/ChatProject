@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class ChatThread implements Runnable {
     //생성자를 통해서 클라이언트 소켓을 얻어옴.
@@ -35,7 +36,6 @@ class ChatThread implements Runnable {
             //Client가 접속하자마 id를 보낸다는 약속!!
             nickname = in.readLine();
             //이때..  모든 사용자에게 id님이 입장했다라는 정보를 알려줌.
-//            broadcast(nickname + "님이 입장하셨습니다.");
             System.out.println(clientIP);
             System.out.println(nickname + "닉네임의 사용자가 연결했습니다.");
             //동시에 일어날 수도..
@@ -65,6 +65,8 @@ class ChatThread implements Runnable {
                         for (ChatRoom room : chatRooms.values()) {
                             out.println(room.getRoomName());
                         }
+                    } else if (msg.equals("/users")) {
+                        listUsers();
                     }
                 } else {
                     if (msg.startsWith("/bye")) {
@@ -73,7 +75,11 @@ class ChatThread implements Runnable {
                     } else if (msg.startsWith("/w ")) {
                         whisper(msg);
                     } else if (msg.startsWith("/exit")) {
-                        
+                        exitRoom(msg);
+                    } else if (msg.equals("/users")) {
+                        listUsers();
+                    } else if (msg.equals("/roomusers")) {
+                        listRoomUsers();
                     } else {
                         broadcast(nickname + " : " + msg, chatRooms.get(roomName));
                     }
@@ -109,7 +115,7 @@ class ChatThread implements Runnable {
 
     //전체 사용자에게 알려주는 메서드
     public void broadcast(String msg, ChatRoom chatRoom) {
-        List<String> clientsInRoom = chatRoom.getClient();
+        Set<String> clientsInRoom = chatRoom.getClient();
         for (String participant : clientsInRoom) {
             PrintWriter participantWriter = chatClients.get(participant);
             if (participantWriter != null) {
@@ -133,8 +139,8 @@ class ChatThread implements Runnable {
         PrintWriter receiverPW = chatClients.get(name); // 수신자의 PrintWriter
 
         if (receiverPW != null && !this.nickname.equals(name)) { // 수신자가 존재하면 메시지 전송
+//            out.println("[귓속말] " + name + "님에게 전송: " + message); // 보내는 클라이언트에게도 메시지 전송 확인
             receiverPW.println("[귓속말] " + nickname + " : " + message);
-            out.println("[귓속말] " + name + "님에게 전송: " + message); // 보내는 클라이언트에게도 메시지 전송 확인
         } else if (this.nickname.equals(name)) {
             out.println("오류!! : 본인에게는 귓속말을 보내실 수 없습니다.");
         } else {
@@ -179,5 +185,38 @@ class ChatThread implements Runnable {
         out.println(roomName + " 방에 입장했습니다.");
         this.roomName = roomName; // 현재 방 이름 설정
 
+    }
+    public void exitRoom (String msg) {
+        inRoom = false;
+        out.println("방 나가기 완료");
+        ChatRoom room = chatRooms.get(roomName);
+        if (room != null) {
+            room.removeClient(nickname); // 채팅방에서 클라이언트 제거
+            broadcast(nickname + "님이 채팅방을 나갔습니다.", room); // 다른 클라이언트에게 알림
+        }
+        this.roomName = "";
+    }
+
+    public void listUsers() {
+        out.println("현재 접속 중인 사용자 목록:");
+        for (String user : chatClients.keySet()) {
+            out.println(user);
+        }
+    }
+
+    public void listRoomUsers() {
+        if (!inRoom) {
+            out.println("방에 참여 중이 아닙니다.");
+            return;
+        }
+        ChatRoom room = chatRooms.get(roomName);
+        if (room == null) {
+            out.println("현재 방이 존재하지 않습니다.");
+            return;
+        }
+        out.println("현재 방에 있는 사용자 목록:");
+        for (String user : room.getClient()) {
+            out.println(user);
+        }
     }
 }

@@ -1,22 +1,23 @@
 package com.chatting_kbg.test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChatRoom {
     private String roomName;
-    private List<String> clients;
+    private Set<String> clients = new HashSet<>();
 
     public ChatRoom(String roomName) {
         this.roomName = roomName;
-        this.clients = new ArrayList<>();
     }
 
     public String getRoomName() {
         return roomName;
     }
 
-    public List<String> getClient() {
+    public Set<String> getClient() {
         return clients;
     }
 

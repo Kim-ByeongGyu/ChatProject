@@ -1,7 +1,5 @@
 package com.chatting_kbg.test;
 
-import com.chatting_kbg.original.ServerMessageReader;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,27 +39,44 @@ public class ChatClient {
                 String[] commands = userInput.split(" ", 2);
                 String command = commands[0];
                 if (!inRoom) {
-                    if ("/create".equals(command)) {
-                        out.println(userInput); // 서버에 방 생성 요청 전송
-                    } else if ("/join".equals(command)) {
-                        out.println(userInput); // 서버에 방 참여 요청 전송
-                        currentRoom = commands[1];
-                        inRoom = true;
-                    } else if ("/list".equals(userInput)) {
-                        out.println(userInput);
-                    } else {
-                        System.out.println("방에 참여해주세요.");
+                    switch (command) {
+                        case "/create":
+                        case "/list":
+                            out.println(userInput); // 서버에 해당 명령 전송
+                            break;
+                        case "/join":
+                            inRoom = true;
+                            out.println(userInput);
+                            break;
+                        case "/users":
+                        case "/roomusers":
+                            out.println(command); // 서버에 명령만 전송
+                            break;
+                        default:
+                            System.out.println("방에 참여해주세요.");
+                            break;
                     }
                 } else {
                     if (userInput.startsWith("/bye")) {
                         out.println(userInput);
                         break;
                     }
+                    if (userInput.startsWith("/exit")) {
+                        out.println(userInput);
+                        inRoom = false; // 채팅방에서 나갔음을 표시
+                        currentRoom = ""; // 현재 방 초기화
+                        continue;
+                    }
                     if (userInput.startsWith("/w ")) {
                         out.println(userInput);
                     }
-                        out.println(currentRoom + " " + userInput); // 자신의 메시지를 서버로 보내지 않음
-
+                    if (command.equals("/users")) {
+                        out.println(userInput); // 서버에 명령 전송
+                    }
+                    if (command.equals("/roomusers")) {
+                        out.println(userInput); // 서버에 명령 전송
+                    }
+                        out.println(userInput);
                 }
 
             } // while
