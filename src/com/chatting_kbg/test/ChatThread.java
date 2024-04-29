@@ -68,11 +68,12 @@ class ChatThread implements Runnable {
                     } else if (msg.equals("/users")) {
                         listUsers();
                     }
-                } else {
                     if (msg.startsWith("/bye")) {
-                        System.out.println(nickname + "닉네임의 사용자가 연결을 끊었습니다.");
+                        System.out.println(nickname + "님이 연결을 끊었습니다.");
                         break;
-                    } else if (msg.startsWith("/w ")) {
+                    }
+                } else {
+                    if (msg.startsWith("/w ")) {
                         whisper(msg);
                     } else if (msg.startsWith("/exit")) {
                         exitRoom(msg);
@@ -115,11 +116,22 @@ class ChatThread implements Runnable {
 
     //전체 사용자에게 알려주는 메서드
     public void broadcast(String msg, ChatRoom chatRoom) {
-        Set<String> clientsInRoom = chatRoom.getClient();
-        for (String participant : clientsInRoom) {
-            PrintWriter participantWriter = chatClients.get(participant);
-            if (participantWriter != null) {
-                participantWriter.println(msg);
+//        Set<String> clientsInRoom = chatRoom.getClient();
+//        for (String participant : clientsInRoom) {
+//            PrintWriter participantWriter = chatClients.get(participant);
+//            if (participantWriter != null) {
+//                participantWriter.println(msg);
+//                chatRooms.get(roomName).logChat(msg);
+//            }
+//        }
+        if (chatRoom != null) { // chatRoom이 null이 아닌 경우에만 실행
+            Set<String> clientsInRoom = chatRoom.getClient();
+            for (String participant : clientsInRoom) {
+                PrintWriter participantWriter = chatClients.get(participant);
+                if (participantWriter != null) {
+                    participantWriter.println(msg);
+                    chatRoom.logChat(msg);
+                }
             }
         }
     }
@@ -161,7 +173,6 @@ class ChatThread implements Runnable {
         }
 
         ChatRoom newRoom = new ChatRoom(roomName);
-        newRoom.addClient(nickname);
         chatRooms.put(roomName, newRoom);
         out.println(roomName + " 방이 생성되었습니다.");
     }
@@ -182,7 +193,7 @@ class ChatThread implements Runnable {
         inRoom = true;
         room.addClient(nickname);
         roomName = parts[1]; // 방 이름 설정
-        out.println(roomName + " 방에 입장했습니다.");
+        out.println(roomName + "님이 방에 입장했습니다.");
         this.roomName = roomName; // 현재 방 이름 설정
 
     }
@@ -210,10 +221,7 @@ class ChatThread implements Runnable {
             return;
         }
         ChatRoom room = chatRooms.get(roomName);
-        if (room == null) {
-            out.println("현재 방이 존재하지 않습니다.");
-            return;
-        }
+
         out.println("현재 방에 있는 사용자 목록:");
         for (String user : room.getClient()) {
             out.println(user);

@@ -1,9 +1,6 @@
 package com.chatting_kbg.test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -41,54 +38,65 @@ public class ChatClient {
                 if (!inRoom) {
                     switch (command) {
                         case "/create":
+                            out.println(userInput);
+                            break;
                         case "/list":
-                            out.println(userInput); // 서버에 해당 명령 전송
+                            out.println(userInput);
                             break;
                         case "/join":
                             inRoom = true;
                             out.println(userInput);
                             break;
                         case "/users":
-                        case "/roomusers":
-                            out.println(command); // 서버에 명령만 전송
+                            out.println(userInput);
                             break;
+                        case "/roomusers":
+                            out.println(userInput);
+                            break;
+                        case "/bye":
+                            out.println(userInput);
+                            socket.close();
+                            return;
                         default:
                             System.out.println("방에 참여해주세요.");
                             break;
                     }
                 } else {
-                    if (userInput.startsWith("/bye")) {
-                        out.println(userInput);
-                        break;
+                    switch (command) {
+                        case "/exit":
+                            out.println(userInput);
+                            inRoom = false; // 채팅방에서 나갔음을 표시
+                            currentRoom = ""; // 현재 방 초기화
+                            continue;
+                        case "/w ":
+                            out.println(userInput);
+                            break;
+                        case "/users":
+                            out.println(userInput);
+                            break;
+                        case "/roomusers":
+                            out.println(userInput);
+                            break;
+                        default:
+                            out.println(userInput);
                     }
-                    if (userInput.startsWith("/exit")) {
-                        out.println(userInput);
-                        inRoom = false; // 채팅방에서 나갔음을 표시
-                        currentRoom = ""; // 현재 방 초기화
-                        continue;
-                    }
-                    if (userInput.startsWith("/w ")) {
-                        out.println(userInput);
-                    }
-                    if (command.equals("/users")) {
-                        out.println(userInput); // 서버에 명령 전송
-                    }
-                    if (command.equals("/roomusers")) {
-                        out.println(userInput); // 서버에 명령 전송
-                    }
-                        out.println(userInput);
                 }
 
             } // while
-
-            // 클라이언트와 서버는 명시적으로 close를 합니다. close를 할 경우 상대방쪽의 readLine()이 null을 반환됩니다. 이 값을 이용하여 접속이 종료된 것을 알 수 있습니다.
-            in.close();
-            out.close();
-            socket.close();
-
         } catch (IOException e) {
             System.out.println("Exception caught when trying to connect to " + hostName + " on port " + portNumber);
             e.printStackTrace();
+        } finally {
+            try {
+                if (in != null)
+                    in.close();
+                if (out != null)
+                    out.close();
+                if (socket != null)
+                    socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
