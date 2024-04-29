@@ -35,6 +35,7 @@ class ChatThread implements Runnable {
             String clientIP = socket.getInetAddress().getHostAddress();
             //Client가 접속하자마 id를 보낸다는 약속!!
             nickname = in.readLine();
+
             //이때..  모든 사용자에게 id님이 입장했다라는 정보를 알려줌.
             System.out.println(clientIP);
             System.out.println(nickname + "닉네임의 사용자가 연결했습니다.");

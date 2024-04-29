@@ -28,7 +28,8 @@ public class ChatClient {
             // 서버로부터 메시지를 읽어 화면에 출력하는 별도의 스레드
             Thread readThread = new Thread(new ServerMessageReader(in));
             readThread.start(); // 메시지 읽기 스레드 시작
-
+            help();
+            System.out.println("접속되었습니다.");
             // 사용자 입력 처리
             String userInput;
             while (true) {
@@ -48,9 +49,6 @@ public class ChatClient {
                             out.println(userInput);
                             break;
                         case "/users":
-                            out.println(userInput);
-                            break;
-                        case "/roomusers":
                             out.println(userInput);
                             break;
                         case "/bye":
@@ -81,6 +79,9 @@ public class ChatClient {
                             out.println(userInput);
                     }
                 }
+                if ("/help".equals(command)) {
+                    help();
+                }
 
             } // while
         } catch (IOException e) {
@@ -98,5 +99,19 @@ public class ChatClient {
                 e.printStackTrace();
             }
         }
+    }
+    private static void help() {
+        System.out.println("언제든 가능한 명령어");
+        System.out.println("\t명령어 모음 : /help");
+        System.out.println("\t접속 유저 목록 : /users");
+        System.out.println("로비 명령어");
+        System.out.println("\t방 생성 : /create 방이름(중복 불가)");
+        System.out.println("\t방 참가 : /join 방이름");
+        System.out.println("\t방 목록 : /list");
+        System.out.println("\t접속종료 : /bye");
+        System.out.println("채팅방 명령어");
+        System.out.println("\t귓속말 : /w 닉네임 할말");
+        System.out.println("\t채팅방 유저 목록 : /roomusers");
+        System.out.println("\t채팅방 나가기 : /exit");
     }
 }
